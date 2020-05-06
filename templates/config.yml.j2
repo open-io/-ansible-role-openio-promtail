@@ -1,0 +1,73 @@
+server:
+  http_listen_address: {{ openio_promtail_bind_address }}
+  http_listen_port: {{ openio_promtail_bind_port }}
+  grpc_listen_port: 0
+
+positions:
+  filename: {{ openio_service_volume }}/positions.yml
+
+{% if openio_promtail_loki_group in groups %}
+{%   if groups[openio_promtail_loki_group] | length > 0 %}
+clients:
+{%     for host in groups[openio_promtail_loki_group] %}
+{%       set ip = hostvars[host].openio_loki_bind_address | d(hostvars[host].openio_mgmt_bind_address) | d(hostvars[host].ansible_default_ipv4.address)  %}
+{%       set port = hostvars[host].openio_loki_bind_port | d(openio_promtail_loki_port)  %}
+  - url: "http://{{ ip }}:{{ port }}/loki/api/v1/push"
+{%     endfor %}
+{%   endif %}
+{% endif %}
+
+scrape_configs:
+  - job_name: journal
+    journal:
+      max_age: 12h
+      labels:
+        job: systemd-journal
+    relabel_configs:
+
+      - action: replace
+        source_labels: ['__journal__hostname']
+        target_label: 'host'
+
+      - action: replace
+        source_labels: ['__journal_priority']
+        target_label: 'syslog_priority'
+
+      - action: replace
+        source_labels: ['__journal_syslog_facility']
+        target_label: syslog_facility
+
+      - action: replace
+        source_labels: ['__journal_syslog_identifier']
+        target_label: __tmp_id
+
+      - action: keep
+        regex: 'OIO,\w+,\w+,\d+'
+        source_labels: ['__tmp_id']
+
+      - action: replace
+        source_labels: ['__tmp_id']
+        target_label: namespace
+        regex: 'OIO,(\w+),\w+,\d+'
+        replacement: '${1}'
+
+      - action: replace
+        source_labels: ['__tmp_id']
+        target_label: service_type
+        regex: 'OIO,\w+,(\w+),\d+'
+        replacement: '${1}'
+
+      - action: replace
+        source_labels: ['__tmp_id']
+        target_label: service_index
+        regex: 'OIO,\w+,\w+,(\d+)'
+        replacement: '${1}'
+
+      - action: replace
+        source_labels: ['__tmp_id']
+        target_label: service
+        regex: 'OIO,\w+,(\w+),(\d+)'
+        replacement: '${1}-${2}'
+
+    pipeline_stages: []
+

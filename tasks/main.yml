@@ -1,0 +1,26 @@
+---
+- include_role:
+    name: openio-service
+  vars:
+    openio_service_type: "oio-promtail"
+    openio_service_namespace: "{{ openio_promtail_namespace }}"
+    openio_service_maintenance_mode: "{{ openio_promtail_maintenance_mode }}"
+    openio_service_packages:
+      - oio-promtail
+    openio_service_directories:
+      - path: "{{ openio_service_volume }}"
+    openio_service_configuration_files:
+      - name: config.yml
+    openio_service_services:
+      - command: >-
+          /usr/sbin/oio-promtail
+          -config.file={{ openio_service_conf_dir }}/config.yml
+        redirect_stdout_to_syslog: true
+        uid: root
+        gid: root
+    openio_service_checks:
+      - uri:
+          url: "http://{{ openio_promtail_bind_address }}:{{ openio_promtail_bind_port }}/ready"
+        retries: 10
+        delay: 2
+...
