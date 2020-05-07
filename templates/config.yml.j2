@@ -10,7 +10,7 @@ positions:
 {%   if groups[openio_promtail_loki_group] | length > 0 %}
 clients:
 {%     for host in groups[openio_promtail_loki_group] %}
-{%       set ip = hostvars[host].openio_loki_bind_address | d(hostvars[host].openio_mgmt_bind_address) | d(hostvars[host].ansible_default_ipv4.address)  %}
+{%       set ip = hostvars[host].openio_loki_bind_address | d(hostvars[host].openio_bind_mgmt_address) | d(hostvars[host].ansible_default_ipv4.address)  %}
 {%       set port = hostvars[host].openio_loki_bind_port | d(openio_promtail_loki_port)  %}
   - url: "http://{{ ip }}:{{ port }}/loki/api/v1/push"
 {%     endfor %}
