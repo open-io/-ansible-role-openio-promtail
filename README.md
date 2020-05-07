@@ -15,7 +15,7 @@ An Ansible role for install promtail. Specifically, the responsibilities of this
 | :---       | :---    | :---             |
 | `openio_promtail_namespace` | `"{{ namespace \| d('OPENIO') }}"` | OpenIO Namespace |
 | `openio_promtail_maintenance_mode` | `"{{ openio_maintenance_mode \| d(false) }}"` | Maintenance mode |
-| `openio_promtail_bind_address` | `"{{ openio_mgmt_bind_address \| d(ansible_default_ipv4.address) }}"` | Binding IP address |
+| `openio_promtail_bind_address` | `"{{ openio_bind_mgmt_address \| d(ansible_default_ipv4.address) }}"` | Binding IP address |
 | `openio_promtail_bind_port` | `6900` | Binding port |
 | `openio_promtail_loki_group` | `"loki"`  | Lloki group in the inventory |
 | `openio_promtail_loki_port` | `6902` | Default port on which loki listens |
