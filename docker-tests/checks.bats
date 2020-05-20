@@ -24,13 +24,13 @@ run_only_test() {
 }
 
 @test 'Promtail config file exists' {
-  run bash -c "docker exec -ti ${SUT_ID} cat /etc/oio/sds/TRAVIS/oio-promtail-0/config.yml"
+  run bash -c "docker exec -ti ${SUT_ID} cat /etc/oio/sds/TRAVIS/promtail-0/config.yml"
   echo "output: "$output
   [[ "${status}" -eq "0" ]]
 }
 
 @test 'Promtail configuration file is valid YAML' {
-    run bash -c "docker exec -ti ${SUT_ID} find /etc/oio/sds/TRAVIS/oio-promtail-0/ -name \*.yml -exec python -c \
+    run bash -c "docker exec -ti ${SUT_ID} find /etc/oio/sds/TRAVIS/promtail-0/ -name \*.yml -exec python -c \
     'import sys,yaml; yaml.load(open(sys.argv[1]).read(), Loader=yaml.SafeLoader);' {} \;"
     echo "output: "$output
     [[ "${output}" -eq "" ]]
