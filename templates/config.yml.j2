@@ -20,7 +20,7 @@ clients:
 scrape_configs:
   - job_name: journal
     journal:
-      max_age: 12h
+      max_age: 1s
       labels:
         job: systemd-journal
     relabel_configs:
@@ -69,5 +69,97 @@ scrape_configs:
         regex: 'OIO,\w+,(\w+),(\d+)'
         replacement: '${1}-${2}'
 
-    pipeline_stages: []
+{% raw %}
+    pipeline_stages:
 
+      # oioswift
+      - match:
+          selector: '{service_type="oioswift"}'
+          stages:
+            - regex:
+                expression: '^(?P<remote_addr>\S+) (?P<local_addr>\S+) \S+ (?P<method>\S+) (?P<url>\S+) \S+ (?P<status>\S+) \S+ (?P<user_agent>\S+) \S+ (?P<req_size>\S+) (?P<resp_size>\S+) \S+ (?P<txid>\S+) \S+ (?P<resp_time>\S+) (?P<swift_source>\S+) (?P<swift_s3_op>\S+) (?P<req_start_time>\S+) (?P<req_end_time>\S+) (?P<policy_index>\S+)$'
+
+            - template:
+                source: log_type
+                template: '{{ if .method }}access{{ else }}info{{ end }}'
+
+            - labels:
+                log_type:
+
+            - template:
+                source: message
+                template: "{{ if .method }}remote_addr={{ .remote_addr }} method={{ .method }} url={{ .url }} status={{ .status }} user_agent={{ .user_agent }} req_size={{ .req_size }} resp_size={{ .resp_size }} txid={{ .txid }} resp_time={{ .resp_time }} swift_source={{ .swift_source }} swift_s3_op={{ .swift_s3_op }} req_start_time={{ .req_start_time }} req_end_time={{ .req_end_time }} policy_index={{ .policy_index }}{{ end }}"
+
+            - output:
+                source: message
+
+      # rawx
+      - match:
+          selector: '{service_type="rawx"}'
+          stages:
+            - regex:
+                expression: '^\S+ access \S+ \S+ (?P<local_addr>\S+) (?P<remote_addr>\S+) (?P<method>\S+) (?P<status>\S+) (?P<resp_time_us>\S+) (?P<resp_size>\S+) (?P<req_size>\S+) \S+ (?P<txid>\S+) (?P<url>\S+)$'
+
+            - template:
+                source: log_type
+                template: '{{ if .method }}access{{ else }}info{{ end }}'
+
+            - labels:
+                log_type:
+
+            - template:
+                source: message
+                template: "{{ if .method }}remote_addr={{ .remote_addr }} method={{ .method }} url={{ .url }} status={{ .status }} req_size={{ .req_size }} resp_size={{ .resp_size }} txid={{ .txid }} resp_time_us={{ .resp_time_us }}{{ end }}"
+
+            - output:
+                source: message
+
+      # oioproxy
+      - match:
+          selector: '{service_type="oioproxy"}'
+          stages:
+            - regex:
+                expression: '^(?P<process_id>\S+) (?P<thread_id>\S+) access \S+ (?P<local_addr>\S+) (?P<remote_addr>\S+) (?P<method>\S+) (?P<status>\S+) (?P<resp_time_us>\S+) (?P<req_size>\S+) \S+ (?P<txid>\S+) (?P<url>\S+) (?P<playload>.*)$'
+
+            - template:
+                source: log_type
+                template: '{{ if .method }}access{{ else }}info{{ end }}'
+
+            - labels:
+                log_type:
+
+            - template:
+                source: log_type
+                template: '{{ if .method }}access{{ else }}info{{ end }}'
+
+            - labels:
+                log_type:
+
+            - template:
+                source: message
+                template: '{{ if .method }}remote_addr={{ .remote_addr }} method={{ .method }} url={{ .url }} status={{ .status }} req_size={{ .req_size }} txid={{ .txid }} resp_time_us={{ .resp_time_us }} {{ .playload }}{{ end }}'
+
+            - output:
+                source: message
+
+      # meta*
+      - match:
+          selector: '{service_type=~"meta.*"}'
+          stages:
+            - regex:
+                expression: '^(?P<process_id>\S+) (?P<thread_id>\S+) access \S+ (?P<local_addr>\S+) (?P<remote_addr>\S+) (?P<method>\S+) (?P<status>\S+) (?P<resp_time_us>\S+) (?P<req_size>\S+) \S+ (?P<txid>\S+) (?P<playload>.*)$'
+
+            - template:
+                source: log_type
+                template: '{{ if .method }}access{{ else }}info{{ end }}'
+
+            - labels:
+                log_type:
+
+            - template:
+                source: message
+                template: "{{ if .method }}remote_addr={{ .remote_addr }} method={{ .method }} status={{ .status }} req_size={{ .req_size }} txid={{ .txid }} resp_time_us={{ .resp_time_us }} {{ .playload }}{{ end }}"
+
+            - output:
+                source: message
+{% endraw %}
