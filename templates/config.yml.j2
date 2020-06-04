@@ -33,170 +33,170 @@ scrape_configs:
       # extract and convert priority to log_leve
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^0$'
         replacement: 'EMERG'
 
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^1$'
         replacement: 'ALERT'
 
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^2$'
         replacement: 'CRIT'
 
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^3$'
         replacement: 'ERROR'
 
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^4$'
         replacement: 'WARNING'
 
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^5$'
         replacement: 'NOTICE'
 
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^6$'
         replacement: 'INFO'
 
       - action: replace
         source_labels: ['__journal_priority']
-        target_label: 'log_level'
+        target_label: 'level'
         regex: '^7$'
         replacement: 'DEBUG'
 
       # extract and convert syslog_facility
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^0$'
         replacement: 'KERN'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^1$'
         replacement: 'USER'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^2$'
         replacement: 'MAIL'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^3$'
         replacement: 'DAEMON'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^4$'
         replacement: 'AUTH'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^5$'
         replacement: 'SYSLOG'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^6$'
         replacement: LPR''
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^7$'
         replacement: 'NEWS'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^8$'
         replacement: 'UUCP'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^9$'
         replacement: 'CRON'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^10$'
         replacement: 'AUTHPRIV'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^11$'
         replacement: 'FTP'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^16$'
         replacement: 'LOCAL0'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^17$'
         replacement: 'LOCAL1'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^18$'
         replacement: 'LOCAL2'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^19$'
         replacement: 'LOCAL3'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^20$'
         replacement: 'LOCAL4'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^21$'
         replacement: 'LOCAL5'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^22$'
         replacement: 'LOCAL6'
 
       - action: replace
         source_labels: ['__journal_syslog_facility']
-        target_label: 'log_facility'
+        target_label: 'facility'
         regex: '^23$'
         replacement: 'LOCAL7'
 
@@ -236,7 +236,7 @@ scrape_configs:
 
       # by default, all lines are considered as info logs
       - template:
-          source: log_type
+          source: log
           template: info
 
       # oioswift
@@ -250,12 +250,12 @@ scrape_configs:
             # if {{ .method }} is not set it means the regex did not match
             # set log type
             - template:
-                source: log_type
+                source: log
                 template: '{{ if .method }}access{{ else }}info{{ end }}'
 
-            # export log_type label
+            # export log label
             - labels:
-                log_type:
+                log:
 
             # convert log line to key=value syntax if regex matched
             # otherwise return empty string which does not modify the message variable
@@ -278,12 +278,12 @@ scrape_configs:
             # if {{ .method }} is not set it means the regex did not match
             # set log type
             - template:
-                source: log_type
+                source: log
                 template: '{{ if .method }}access{{ else }}info{{ end }}'
 
-            # export log_type label
+            # export log label
             - labels:
-                log_type:
+                log:
 
             # convert log line to key=value syntax if regex matched
             # otherwise return empty string which does not modify the message variable
@@ -306,12 +306,12 @@ scrape_configs:
             # if {{ .method }} is not set it means the regex did not match
             # set log type
             - template:
-                source: log_type
+                source: log
                 template: '{{ if .method }}access{{ else }}info{{ end }}'
 
-            # export log_type label
+            # export log label
             - labels:
-                log_type:
+                log:
 
             # convert log line to key=value syntax if regex matched
             # otherwise return empty string which does not modify the message variable
@@ -334,12 +334,12 @@ scrape_configs:
             # if {{ .method }} is not set it means the regex did not match
             # set log type
             - template:
-                source: log_type
+                source: log
                 template: '{{ if .method }}access{{ else }}info{{ end }}'
 
-            # export log_type label
+            # export log label
             - labels:
-                log_type:
+                log:
 
             # convert log line to key=value syntax if regex matched
             # otherwise return empty string which does not modify the message variable
@@ -350,4 +350,15 @@ scrape_configs:
             # replace line with message variable
             - output:
                 source: message
+
+      # set log level to TRACE for access logs
+      - match:
+          selector: '{log="access"}'
+          stages:
+            - template:
+                source: level
+                template: "TRACE"
+            - labels:
+                level:
+
 {% endraw %}
