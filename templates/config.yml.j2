@@ -273,7 +273,7 @@ scrape_configs:
           stages:
             # match access logs
             - regex:
-                expression: '^\S+ access \S+ \S+ (?P<local_addr>\S+) (?P<remote_addr>\S+) (?P<method>\S+) (?P<status>\S+) (?P<resp_time_us>\S+) (?P<resp_size>\S+) (?P<req_size>\S+) \S+ (?P<txid>\S+) (?P<url>\S+)$'
+                expression: '^\S+ access \S+ \S+ (?P<local_addr>\S+) (?P<remote_addr>\S+) (?P<method>\S+) (?P<status>\S+) (?P<resp_time_us>\S+) (?P<resp_size>\S+) (?P<req_size>\S+) \S+ (?P<txid>\S+) (?P<url>\S+) (?P<protocol>https?)$'
 
             # if {{ .method }} is not set it means the regex did not match
             # set log type
@@ -289,7 +289,7 @@ scrape_configs:
             # otherwise return empty string which does not modify the message variable
             - template:
                 source: message
-                template: "{{ if .method }}remote_addr={{ .remote_addr }} method={{ .method }} url={{ .url }} status={{ .status }} req_size={{ .req_size }} resp_size={{ .resp_size }} txid={{ .txid }} resp_time_us={{ .resp_time_us }}{{ end }}"
+                template: "{{ if .method }}remote_addr={{ .remote_addr }} method={{ .method }} url={{ .url }} status={{ .status }} req_size={{ .req_size }} resp_size={{ .resp_size }} txid={{ .txid }} resp_time_us={{ .resp_time_us }} protocol={{ .protocol }}{{ end }}"
 
             # replace line with message variable
             - output:
